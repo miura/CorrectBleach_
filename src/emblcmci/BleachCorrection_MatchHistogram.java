@@ -1,33 +1,34 @@
 package emblcmci;
 /**
- * based on original:"Match_To_Image_Histogram.java"(http://www.imagingbook.com)
- * original package "histogram2" is untouched, and required for the plugin to run.  
+ * based on original:"Match_To_Image_Histogram.java"
+ * (http://www.imagingbook.com)
+ * original package from above site "histogram2" is
+ *  required for the plugin to run.  
  * 
  *  
  */
-
-import java.util.Properties;
 
 import histogram2.HistogramMatcher;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
+import ij.plugin.Duplicator;
 import ij.plugin.PlugIn;
-import ij.plugin.filter.Duplicater;
 import ij.process.ImageProcessor;
 
 public class BleachCorrection_MatchHistogram implements PlugIn { 
 
 	
 	//public ImagePlus imp = DuplicateStack(WindowManager.getCurrentImage()) ;
+	
 	public void run(String arg) {
 		if (WindowManager.getCurrentImage()==null) return;
 		if (WindowManager.getCurrentImage().getStackSize()<2) {
 			IJ.showMessage("need a stack!");
 			return;
 		}
-		ImagePlus imp = new Duplicater().duplicateStack(WindowManager.getCurrentImage(), "bleach_corrected") ;
+		ImagePlus imp = new Duplicator().run(WindowManager.getCurrentImage());//, "bleach_corrected") ;
 
 		if (imp.getBitDepth()!= 8 && imp.getBitDepth()!=16){
 			IJ.showMessage("should be 8 or 16 bit image");
