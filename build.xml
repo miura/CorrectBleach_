@@ -5,7 +5,7 @@
   <property name="build" location="bin" />
   <property name="dist"  location="dist" />
  
-	 <property name="pluginsDir"  location="$basedir/../../IJ/plugins/" />
+	 <property name="pluginsDir"  location="$basedir/../../imagej/plugins/" />
  
   <property name="user.name" value="Kota Miura" ></property>
 <target name="main" depends="compress" description="Main target">

@@ -14,26 +14,27 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.WindowManager;
 import ij.plugin.PlugIn;
+import ij.plugin.filter.Duplicater;
 import ij.process.ImageProcessor;
 
 public class BleachCorrection_MatchHistogram implements PlugIn { 
 
-
-	public ImagePlus imp = DuplicateStack(WindowManager.getCurrentImage()) ;
+	
+	//public ImagePlus imp = DuplicateStack(WindowManager.getCurrentImage()) ;
 	public void run(String arg) {
-		
-//		Properties properties;
-//		properties = imp.getProperties();
-//		imp.setFileInfo(imp.getOriginalFileInfo());
+		if (WindowManager.getCurrentImage()==null) return;
+		if (WindowManager.getCurrentImage().getStackSize()<2) {
+			IJ.showMessage("need a stack!");
+			return;
+		}
+		ImagePlus imp = new Duplicater().duplicateStack(WindowManager.getCurrentImage(), "bleach_corrected") ;
+
 		if (imp.getBitDepth()!= 8 && imp.getBitDepth()!=16){
 			IJ.showMessage("should be 8 or 16 bit image");
 			return;
 		}
 			
-		if (imp.getStackSize()<2) {
-			IJ.showMessage("need a stack!");
-			return;
-		}
+
 		int histbinnum = 0;
 		if (imp.getBitDepth()==8) histbinnum = 256;
 			else if (imp.getBitDepth()==16) histbinnum = 65535;
