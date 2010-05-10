@@ -1,11 +1,13 @@
 package emblcmci;
 /**
- * based on original:"Match_To_Image_Histogram.java"
+ * based on "Match_To_Image_Histogram.java"
  * (http://www.imagingbook.com)
  * original package from above site "histogram2" is
- *  required for the plugin to run.  
+ *  required for this plugin (already included in .jar).  
  * 
- *  
+ *  works with 8bit and 16 bit stacks. 
+ * 
+ *  Kota Miura (CMCI, EMBL Heidelberg)
  */
 
 import histogram2.HistogramMatcher;
@@ -20,8 +22,6 @@ import ij.process.ImageProcessor;
 public class BleachCorrection_MatchHistogram implements PlugIn { 
 
 	
-	//public ImagePlus imp = DuplicateStack(WindowManager.getCurrentImage()) ;
-	
 	public void run(String arg) {
 		if (WindowManager.getCurrentImage()==null) return;
 		if (WindowManager.getCurrentImage().getStackSize()<2) {
@@ -34,8 +34,11 @@ public class BleachCorrection_MatchHistogram implements PlugIn {
 			IJ.showMessage("should be 8 or 16 bit image");
 			return;
 		}
-			
-
+		bleachCorrectionHM(imp);
+	}
+	
+	public void bleachCorrectionHM(ImagePlus imp){
+	
 		int histbinnum = 0;
 		if (imp.getBitDepth()==8) histbinnum = 256;
 			else if (imp.getBitDepth()==16) histbinnum = 65535;
@@ -96,9 +99,8 @@ public class BleachCorrection_MatchHistogram implements PlugIn {
 					IJ.log("corrected time point: "+Integer.toString(i+1));
 				}
 			}
-			
-		} else {
-
+				
+		} else {		//2D case. 
 			for (i=0; i<stack.getSize(); i++){
 				if (i==0) {
 					ipB = stack.getProcessor(i+1);
@@ -115,19 +117,6 @@ public class BleachCorrection_MatchHistogram implements PlugIn {
 		}
 		imp.show();
 	}
-	//duplicate and make another instance of imp
-	public ImagePlus DuplicateStack(ImagePlus ims){
-		ImageStack stack = ims.getImageStack();
-		int[] imsdimA = ims.getDimensions();
-		ImageStack dupstack = ims.createEmptyStack();
-		//ImageStack dupstack = new ImageStack(stack.getWidth(), stack.getHeight());
-		for (int i=0; i<stack.getSize(); i++){
-				dupstack.addSlice(Integer.toString(i), stack.getProcessor(i+1).duplicate(), i); 
-		}
-		ImagePlus dupimp = new ImagePlus("bleach_corrected", dupstack);
-		dupimp.setDimensions(imsdimA[2], imsdimA[3], imsdimA[4]);
-		//dupimp.show();
-		return dupimp;
-	}	
+
 }
 
