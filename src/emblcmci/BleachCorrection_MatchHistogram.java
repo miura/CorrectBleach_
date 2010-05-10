@@ -41,7 +41,7 @@ public class BleachCorrection_MatchHistogram implements PlugIn {
 	
 		int histbinnum = 0;
 		if (imp.getBitDepth()==8) histbinnum = 256;
-			else if (imp.getBitDepth()==16) histbinnum = 65535;
+			else if (imp.getBitDepth()==16) histbinnum = 65536;//65535;
 		
 		boolean is3DT = false; 
 		int zframes = 1;
