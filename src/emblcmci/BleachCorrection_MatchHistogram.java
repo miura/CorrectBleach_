@@ -6,7 +6,7 @@ package emblcmci;
  *  required for this plugin (already included in .jar).  
  * 
  *  works with 8bit and 16 bit stacks. 
- * 
+ * 	TODO implement PluginFilter rather than Plugin
  *  Kota Miura (CMCI, EMBL Heidelberg)
  */
 
