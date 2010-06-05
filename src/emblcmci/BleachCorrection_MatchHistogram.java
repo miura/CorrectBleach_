@@ -23,14 +23,15 @@ public class BleachCorrection_MatchHistogram implements PlugIn {
 
 	
 	public void run(String arg) {
-		if (WindowManager.getCurrentImage()==null) return;
-		if (WindowManager.getCurrentImage().getStackSize()<2) {
+		ImagePlus imp = WindowManager.getCurrentImage();
+		if (imp==null) return;
+		if (imp.getStackSize()<2) {
 			IJ.showMessage("need a stack!");
 			return;
 		}
-		ImagePlus imp = new Duplicator().run(WindowManager.getCurrentImage());//, "bleach_corrected") ;
+		imp = new Duplicator().run(imp);// replace imp content ;
 
-		if (imp.getBitDepth()!= 8 && imp.getBitDepth()!=16){
+		if (imp.getBitDepth() != 8 && imp.getBitDepth()!=16){
 			IJ.showMessage("should be 8 or 16 bit image");
 			return;
 		}
