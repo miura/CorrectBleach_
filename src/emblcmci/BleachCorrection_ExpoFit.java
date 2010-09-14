@@ -1,11 +1,21 @@
 package emblcmci;
 
+/** Bleach Correction by Fitting Exponential Decay function.
+ *  Kota Miura (miura@embl.de)
+ * 
+ * 	unlike 'simple ratio' and 'histogram matching' this method processes
+ *  both 2D and 3D time series in same way, both treated as a single series
+ *  of bleaching. This might not be appropriate when time interval is large. 
+ *  3D processing part should be added. 
+ */
+
 import ij.IJ;
 import ij.ImagePlus;
 import ij.measure.CurveFitter;
 import ij.plugin.frame.Fitter;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
+
 
 public class BleachCorrection_ExpoFit {
 	ImagePlus imp;
