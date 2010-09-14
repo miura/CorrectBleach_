@@ -7,6 +7,10 @@ package emblcmci;
  *  both 2D and 3D time series in same way, both treated as a single series
  *  of bleaching. This might not be appropriate when time interval is large. 
  *  3D processing part should be added. 
+ *  
+ *  TODO create another method "decayFitting3D"
+ *  
+ *  
  */
 
 import ij.IJ;
@@ -28,7 +32,11 @@ public class BleachCorrection_ExpoFit {
 		this.imp = imp;
 	}
 	
-
+	/** Fit the mean intensity time series of given ImagePlus in this class.
+	 * fit equation is 11, parameter from 
+	 * 		http://rsb.info.nih.gov/ij/developer/api/constant-values.html#ij.measure.CurveFitter.STRAIGHT_LINE
+	 * @return an instance of CurveFitter
+	 */
 	public CurveFitter dcayFitting(){
 		ImageProcessor curip;
 		ImageStatistics imgstat;
@@ -62,10 +70,21 @@ public class BleachCorrection_ExpoFit {
 		return cf;
 	}
 
+	/** calculate estimated value from fitted "Exponential with Offset" equation
+	 * 
+	 * @param a  magnitude (difference between max and min of curve)
+	 * @param b  exponent, defines degree of decay
+	 * @param c  offset. 
+	 * @param x  timepoints (or time frame number)
+	 * @return estimate of intensity at x
+	 */
 	public double calcExponentialOffset(double a, double b, double c, double x){
 		return (a * Math.exp(-b*x) + c);
 	}
 	
+	/** does both decay fitting and bleach correction. 
+	 * 
+	 */
 	public void core(){
 		CurveFitter cf = dcayFitting();
 		double[] respara = cf.getParams(); 
