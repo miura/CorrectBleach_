@@ -1,5 +1,24 @@
 package emblcmci;
 
+/** Bleach Correction with three different methods, for 2D and 3D time series.
+ * 	Kota Miura (miura@embl.de)
+ * 
+ * 	Simple Ratio Method: 
+ * 		based on Jens Rietdorf's Method, see http://www.embl.de/eamnet/html/bleach_correction.html
+ * 		works differently with 2D and 3D time series.
+ *
+ *  Exponential Fitting Method:
+ *  	based on MBF-ImageJ method, see http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
+ *  	MBF-ImageJ uses "Exponential" equation for fitting, 
+ *  	whereas this plugin uses "Exponential with Offset"
+ *
+ *  HIstogram Matching Method:
+ *  	New. This does good restoration of bleaching sequence for segmentation
+ *  	but might not be good for intensity quantification.  
+ *  	See documentation at http://cmci.embl.de
+ *  	works differently with 2D and 3D time series.
+ */
+
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
 import ij.plugin.Duplicator;
@@ -12,40 +31,47 @@ import emblcmci.BleachCorrection_SimpleRatio;
 
 public class BleachCorrection implements PlugInFilter {
 		ImagePlus imp;
-		String[] CorrectionMethods =  { "Simple Ratio", "Exponential Fit", "Histogram Matching" }; 
-		private static int CorrectionMethod = 0; // 0: simple ratio 1: exponential fit 2: histogramMatch 
+		
+		String[] CorrectionMethods =  { "Simple Ratio", "Exponential Fit", "Histogram Matching" };
+		
+		/**Correction Method  0: simple ratio 1: exponential fit 2: histogramMatch
+		*/
+		private static int CorrectionMethod = 0;  
 
 		@Override
 		public int setup(String arg, ImagePlus imp) {
 			this.imp = imp;
-			showDialog();
+			if (!showDialog()){
+					return 0;
+			}
 			return DOES_8G+DOES_16+STACK_REQUIRED;
 		}
 
 		@Override
 		public void run(ImageProcessor ip) {
-			ImagePlus impdup = new Duplicator().run(imp);//, "bleach_corrected") ;
-			if 		(CorrectionMethod == 0){			//simple ratio
+			ImagePlus impdup = new Duplicator().run(imp);
+			if 		(CorrectionMethod == 0){			//Simple Ratio Method
 				BleachCorrection_SimpleRatio BCSR = new BleachCorrection_SimpleRatio(impdup);
 				BCSR.correctBleach();
-				//ImagePlus correctedimp = BCMH.correctBleach();			
 			}	
-			else if (CorrectionMethod == 1){	//exponential fitting
+			else if (CorrectionMethod == 1){	//Exponential Fitting Method
 				BleachCorrection_ExpoFit BCEF = new BleachCorrection_ExpoFit(impdup);
-				//BCEF.dcayFitting();
 				BCEF.core();
 			}
-			else if (CorrectionMethod == 2){	//HIstogram Matching
+			else if (CorrectionMethod == 2){	//HIstogram Matching Method
 				BleachCorrection_MH BCMH = new BleachCorrection_MH();
 				BCMH.bleachCorrectionHM(impdup);				
 			}
 			impdup.show();
 		}
 		
+		/**Dialog to ask which method to be used for Bleach Correction
+		 * 
+		 * @return
+		 */
 		public boolean showDialog()	{
 			GenericDialog gd = new GenericDialog("Bleach Correction");
 			gd.addChoice("Correction Method :", CorrectionMethods , CorrectionMethods[CorrectionMethod]);
-			//gd.addNumericField("Min Spot Size for Segmentation (3Dobject) :", this.getMinspotvoxels(), 0);	
 			gd.showDialog();
 			if (gd.wasCanceled()) 
 				return false;
