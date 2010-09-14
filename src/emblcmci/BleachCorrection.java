@@ -1,4 +1,4 @@
-
+package emblcmci;
 
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
