@@ -111,7 +111,7 @@ public class BleachCorrection_MH {// implements PlugIn {
 				}
 			}
 		}
-		imp.show();
+		//imp.show();
 	}
 
 }

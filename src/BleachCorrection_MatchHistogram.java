@@ -23,7 +23,8 @@ public class BleachCorrection_MatchHistogram implements PlugInFilter {
 	public void run(ImageProcessor ip) {
 		ImagePlus impdup = new Duplicator().run(imp);//, "bleach_corrected") ;
 		BleachCorrection_MH BCMH = new BleachCorrection_MH();
-		BCMH.bleachCorrectionHM(impdup);		
+		BCMH.bleachCorrectionHM(impdup);
+		impdup.show();
 	}
 
 }

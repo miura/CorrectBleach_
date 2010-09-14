@@ -1,13 +1,16 @@
+
+
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
 import ij.plugin.Duplicator;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
+import emblcmci.BleachCorrection_ExpoFit;
 import emblcmci.BleachCorrection_MH;
 import emblcmci.BleachCorrection_SimpleRatio;
 
 
-public class BleachCorrection_ implements PlugInFilter {
+public class BleachCorrection implements PlugInFilter {
 		ImagePlus imp;
 		String[] CorrectionMethods =  { "Simple Ratio", "Exponential Fit", "Histogram Matching" }; 
 		private static int CorrectionMethod = 0; // 0: simple ratio 1: exponential fit 2: histogramMatch 
@@ -23,11 +26,14 @@ public class BleachCorrection_ implements PlugInFilter {
 		public void run(ImageProcessor ip) {
 			ImagePlus impdup = new Duplicator().run(imp);//, "bleach_corrected") ;
 			if 		(CorrectionMethod == 0){			//simple ratio
-				BleachCorrection_SimpleRatio BCMH = new BleachCorrection_SimpleRatio(impdup);
-				BCMH.correctBleach();
+				BleachCorrection_SimpleRatio BCSR = new BleachCorrection_SimpleRatio(impdup);
+				BCSR.correctBleach();
 				//ImagePlus correctedimp = BCMH.correctBleach();			
 			}	
-			else if (CorrectionMethod == 1){	//exponential fitting			
+			else if (CorrectionMethod == 1){	//exponential fitting
+				BleachCorrection_ExpoFit BCEF = new BleachCorrection_ExpoFit(impdup);
+				//BCEF.dcayFitting();
+				BCEF.core();
 			}
 			else if (CorrectionMethod == 2){	//HIstogram Matching
 				BleachCorrection_MH BCMH = new BleachCorrection_MH();
@@ -43,7 +49,7 @@ public class BleachCorrection_ implements PlugInFilter {
 			gd.showDialog();
 			if (gd.wasCanceled()) 
 				return false;
-			BleachCorrection_.setCorrectionMethod(gd.getNextChoiceIndex());
+			BleachCorrection.setCorrectionMethod(gd.getNextChoiceIndex());
 			return true;
 			
 		}
