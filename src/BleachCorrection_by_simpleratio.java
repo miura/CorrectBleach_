@@ -17,12 +17,14 @@ public class BleachCorrection_by_simpleratio implements PlugInFilter {
 
 	@Override
 	public void run(ImageProcessor ip) {
-		//ImagePlus impdup = new Duplicator().run(imp);//, "bleach_corrected") ;
-		BleachCorrection_SimpleRatio BCMH = new BleachCorrection_SimpleRatio(imp);
-		ImagePlus correctedimp = BCMH.correctBleach();
+		ImagePlus impdup = new Duplicator().run(imp);//, "bleach_corrected") ;
+		BleachCorrection_SimpleRatio BCMH = new BleachCorrection_SimpleRatio(impdup);
+		//ImagePlus correctedimp = BCMH.correctBleach();
+		BCMH.correctBleach();
 		//ImagePlus correctedimp = BCMH.getImp();
-		if (correctedimp != null)
-			correctedimp.show();
+		//if (correctedimp != null)
+		//	correctedimp.show();
+		impdup.show();
 	}
 
 }
