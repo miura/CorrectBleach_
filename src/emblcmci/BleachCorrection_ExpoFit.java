@@ -3,12 +3,7 @@ package emblcmci;
 /** Bleach Correction by Fitting Exponential Decay function.
  *  Kota Miura (miura@embl.de)
  * 
- * Uunlike 'simple ratio' and 'histogram matching' this method processes
- * both 2D and 3D time series in same way, both treated as a single series
- * of bleaching. This might not be appropriate when time interval is large. 
- * 3D processing part should be added. 
- *  
- * TODO create another method "decayFitting3D"
+ * 2D and 3D time series processed in different ways. 
  *  
  * Copyright © 2010 Kota Miura
  * License: GPL 2
@@ -36,6 +31,7 @@ import ij.process.ImageStatistics;
 
 public class BleachCorrection_ExpoFit {
 	ImagePlus imp;
+	boolean is3DT = false; 
 
 	/**
 	 * @param imp
@@ -83,6 +79,39 @@ public class BleachCorrection_ExpoFit {
 		return cf;
 	}
 
+	public CurveFitter decayFitting3D(int zframes, int tframes){
+		ImageProcessor curip;
+		ImageStatistics imgstat;
+		double[] xA = new double[tframes];
+		double[] yA = new double[tframes];
+		double curStackMean = 0.0; 
+		for (int i = 0; i < tframes; i++){		
+			curStackMean = 0.0;
+			for (int j = 0; j < zframes; j++){
+				curip = imp.getImageStack().getProcessor(i * zframes + j +1);
+//				if (curROI != null) curip.setRoi(curROI);
+				imgstat = curip.getStatistics();
+				curStackMean += imgstat.mean;
+			}
+			curStackMean /= zframes;
+			xA[i] = i; 
+			yA[i] =	curStackMean;				
+		}
+		CurveFitter cf = new CurveFitter(xA, yA);
+		double firstframeint = yA[0];
+		double lastframeint = yA[yA.length-1];
+		double guess_a = firstframeint - lastframeint; 
+		if (guess_a <= 0){
+			IJ.error("This sequence seems to be not decaying");
+			return null;
+		}	
+		cf.doFit(11); // 
+		Fitter.plot(cf);
+		IJ.log(cf.getResultString());
+		return cf;
+	}
+	
+	
 	/** calculate estimated value from fitted "Exponential with Offset" equation
 	 * 
 	 * @param a  magnitude (difference between max and min of curve)
@@ -99,7 +128,21 @@ public class BleachCorrection_ExpoFit {
 	 * 
 	 */
 	public void core(){
-		CurveFitter cf = dcayFitting();
+		int[] impdimA = imp.getDimensions();
+		IJ.log("slices"+Integer.toString(impdimA[3])+"  -- frames"+Integer.toString(impdimA[4]));
+		//IJ.log(Integer.toString(imp.getNChannels())+":"+Integer.toString(imp.getNSlices())+":"+ Integer.toString(imp.getNFrames()));
+		int zframes = impdimA[3]; 
+		int tframes = impdimA[4];
+		if (impdimA[3]>1 && impdimA[4]>1){	// if slices and frames are both more than 1
+			is3DT =true;
+			if ((impdimA[3] * impdimA[4]) != imp.getStackSize()){
+				IJ.showMessage("slice and time frames do not match with the length of the stack. Please correct!");
+				return;
+			}
+		}
+		CurveFitter cf;
+		if (is3DT) cf = decayFitting3D(zframes, tframes);
+		else cf = dcayFitting();
 		double[] respara = cf.getParams(); 
 		double res_a = respara[0];
 		double res_b = respara[1];
@@ -107,10 +150,20 @@ public class BleachCorrection_ExpoFit {
 		double ratio = 0.0;
 		ImageProcessor curip;
 		System.out.println(res_a + "," + res_b + "," + res_c);
-		for (int i = 0; i < imp.getStackSize(); i++){
-			curip = imp.getImageStack().getProcessor(i+1);
-			ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
-			curip.multiply(ratio);
+		if (is3DT){
+			for (int i = 0; i < tframes; i++){
+				for (int j = 0; j < zframes; j++){
+					curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+					curip.multiply(ratio);					
+				}
+			}	
+		} else {
+			for (int i = 0; i < imp.getStackSize(); i++){
+				curip = imp.getImageStack().getProcessor(i+1);
+				ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+				curip.multiply(ratio);
+			}
 		}
 	}
 	
