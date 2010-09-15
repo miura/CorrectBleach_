@@ -3,14 +3,27 @@ package emblcmci;
 /** Bleach Correction by Fitting Exponential Decay function.
  *  Kota Miura (miura@embl.de)
  * 
- * 	unlike 'simple ratio' and 'histogram matching' this method processes
- *  both 2D and 3D time series in same way, both treated as a single series
- *  of bleaching. This might not be appropriate when time interval is large. 
- *  3D processing part should be added. 
+ * Uunlike 'simple ratio' and 'histogram matching' this method processes
+ * both 2D and 3D time series in same way, both treated as a single series
+ * of bleaching. This might not be appropriate when time interval is large. 
+ * 3D processing part should be added. 
  *  
- *  TODO create another method "decayFitting3D"
+ * TODO create another method "decayFitting3D"
  *  
- *  
+ * Copyright © 2010 Kota Miura
+ * License: GPL 2
+ *    
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *   
+ * You should have received a copy of the GNU General Public License 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import ij.IJ;

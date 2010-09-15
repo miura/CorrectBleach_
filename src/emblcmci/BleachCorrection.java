@@ -1,22 +1,40 @@
 package emblcmci;
 
 /** Bleach Correction with three different methods, for 2D and 3D time series.
- * 	Kota Miura (miura@embl.de)
+ * 	contact: Kota Miura (miura@embl.de)
  * 
  * 	Simple Ratio Method: 
- * 		based on Jens Rietdorf's Method, see http://www.embl.de/eamnet/html/bleach_correction.html
- * 		works differently with 2D and 3D time series.
+ * 		Migrated version Jens Rietdorf's macro, 
+ * 			see http://www.embl.de/eamnet/html/bleach_correction.html
+ * 		Works differently with 2D and 3D time series.
  *
  *  Exponential Fitting Method:
- *  	based on MBF-ImageJ method, see http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
- *  	MBF-ImageJ uses "Exponential" equation for fitting, 
+ *  	Similar to MBF-ImageJ method. 
+ *  		See http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
+ *  	MBF-ImageJ suggests to use "Exponential" equation for fitting, 
  *  	whereas this plugin uses "Exponential with Offset"
  *
  *  HIstogram Matching Method:
- *  	New. This does good restoration of bleaching sequence for segmentation
- *  	but might not be good for intensity quantification.  
+ *  	This method does much better restoration of bleaching sequence 
+ *  	for segmentation but might not good for intensity quantification.  
  *  	See documentation at http://cmci.embl.de
  *  	works differently with 2D and 3D time series.
+ *  
+ *  
+ * Copyright © 2010 Kota Miura
+ * License: GPL 2
+ *    
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *   
+ * You should have received a copy of the GNU General Public License 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import ij.ImagePlus;

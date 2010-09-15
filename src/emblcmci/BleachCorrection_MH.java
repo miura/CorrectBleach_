@@ -1,12 +1,29 @@
 package emblcmci;
 /**
- * based on "Match_To_Image_Histogram.java"
- * (http://www.imagingbook.com)
+ * Algorithm "Match_To_Image_Histogram.java"
+ * (see http://www.imagingbook.com)
+ * applied to bleach correction. 
  * original package from above site "histogram2" is
- *  required for this plugin (already included in .jar).  
+ * required for this plugin (already included in .jar of this program).  
  * 
- *  works with 8bit and 16 bit stacks. 
- *  Kota Miura (CMCI, EMBL Heidelberg)
+ * contact: Kota Miura (CMCI, EMBL Heidelberg, miura@embl.de)
+ * 
+ * works with 8bit and 16 bit stacks. 
+ *  
+ * Copyright © 2010 Kota Miura
+ * License: GPL 2
+ *    
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *   
+ * You should have received a copy of the GNU General Public License 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import histogram2.HistogramMatcher;

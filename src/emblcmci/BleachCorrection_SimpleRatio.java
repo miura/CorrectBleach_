@@ -1,11 +1,27 @@
 package emblcmci;
 
 /** Bleach Correction Algorithm with Simple Ratio Calculation. 
- *  Based on 2D algorithm of ImageJ Macro written by Jens Rietdorf
+ *  Migrated from 2D algorithm of ImageJ Macro written by Jens Rietdorf
+ *  Original macro could be found at http://www.embl.de/eamnet/html/bleach_correction.html 
  *  
- *  this plugin works on 2D and 3D time series (for 3D time series, it should be a hyperstack). 
+ *  This plugin works on 2D and 3D time series (for 3D time series, it should be a hyperstack). 
  *  in case of 3D times series, mean intensity in the first time point stack becomes the reference.
  *  @author Kota Miura (miura@embl.de)
+ *  
+ * Copyright © 2004, 2005, 2010 Jens Rietdorf, Kota Miura
+ * License: GPL 2
+ *    
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License 2
+ * as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *   
+ * You should have received a copy of the GNU General Public License 
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 import ij.IJ;
