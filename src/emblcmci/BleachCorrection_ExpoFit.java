@@ -79,6 +79,13 @@ public class BleachCorrection_ExpoFit {
 		return cf;
 	}
 
+	/** Curve fitting for 3D time series is done with average intensity value for 
+	 * wach time point (stack intensity mean is used, so the fitted points = time point, not slice number) 
+	 * 
+	 * @param zframes
+	 * @param tframes
+	 * @return
+	 */
 	public CurveFitter decayFitting3D(int zframes, int tframes){
 		ImageProcessor curip;
 		ImageStatistics imgstat;

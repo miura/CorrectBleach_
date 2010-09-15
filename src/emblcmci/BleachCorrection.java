@@ -4,12 +4,11 @@ package emblcmci;
  * 	contact: Kota Miura (miura@embl.de)
  * 
  * 	Simple Ratio Method: 
- * 		Migrated version Jens Rietdorf's macro, 
+ * 		Plugin version of Jens Rietdorf's macro, additionally with 3D time series 
  * 			see http://www.embl.de/eamnet/html/bleach_correction.html
- * 		Works differently with 2D and 3D time series.
  *
  *  Exponential Fitting Method:
- *  	Similar to MBF-ImageJ method. 
+ *  	Similar to MBF-ImageJ method, additionally with 3D time series. 
  *  		See http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
  *  	MBF-ImageJ suggests to use "Exponential" equation for fitting, 
  *  	whereas this plugin uses "Exponential with Offset"
@@ -18,7 +17,6 @@ package emblcmci;
  *  	This method does much better restoration of bleaching sequence 
  *  	for segmentation but might not good for intensity quantification.  
  *  	See documentation at http://cmci.embl.de
- *  	works differently with 2D and 3D time series.
  *  
  *  
  * Copyright © 2010 Kota Miura
