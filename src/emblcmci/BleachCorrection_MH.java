@@ -30,27 +30,31 @@ import histogram2.HistogramMatcher;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
+import ij.gui.Roi;
 import ij.process.ImageProcessor;
 
 public class BleachCorrection_MH {// implements PlugIn { 
-
+	ImagePlus imp;
+	Roi curROI = null;
+	/**
+	 * @param imp
+	 */
+	public BleachCorrection_MH(ImagePlus imp) {
+		super();
+		this.imp = imp;
+	}
+	/** This constructor might not going to be used.
+	 * 	Does not mean much to select a spedific region for the reference histogram.  
+	 * @param imp
+	 * @param curROI
+	 */
+	public BleachCorrection_MH(ImagePlus imp, Roi curROI) {
+		super();
+		this.imp = imp;
+		this.curROI = curROI;
+	}	
 	
-//	public void run(String arg) {
-//		if (WindowManager.getCurrentImage()==null) return;
-//		if (WindowManager.getCurrentImage().getStackSize()<2) {
-//			IJ.showMessage("need a stack!");
-//			return;
-//		}
-//		ImagePlus imp = new Duplicator().run(WindowManager.getCurrentImage());//, "bleach_corrected") ;
-//
-//		if (imp.getBitDepth()!= 8 && imp.getBitDepth()!=16){
-//			IJ.showMessage("should be 8 or 16 bit image");
-//			return;
-//		}
-//		bleachCorrectionHM(imp);
-//	}
-	
-	public void bleachCorrectionHM(ImagePlus imp){
+	public void doCorrection(){
 	
 		int histbinnum = 0;
 		if (imp.getBitDepth()==8) histbinnum = 256;
@@ -130,6 +134,8 @@ public class BleachCorrection_MH {// implements PlugIn {
 		}
 		//imp.show();
 	}
+
+
 
 }
 
