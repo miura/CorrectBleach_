@@ -23,6 +23,7 @@ package emblcmci;
 
 import ij.IJ;
 import ij.ImagePlus;
+import ij.gui.Roi;
 import ij.measure.CurveFitter;
 import ij.plugin.frame.Fitter;
 import ij.process.ImageProcessor;
@@ -32,6 +33,7 @@ import ij.process.ImageStatistics;
 public class BleachCorrection_ExpoFit {
 	ImagePlus imp;
 	boolean is3DT = false; 
+	Roi curROI = null;
 
 	/**
 	 * @param imp
@@ -39,6 +41,12 @@ public class BleachCorrection_ExpoFit {
 	public BleachCorrection_ExpoFit(ImagePlus imp) {
 		super();
 		this.imp = imp;
+	}
+
+	public BleachCorrection_ExpoFit(ImagePlus imp, Roi curROI) {
+		super();
+		this.imp = imp;
+		this.curROI = curROI;
 	}
 	
 	/** Fit the mean intensity time series of given ImagePlus in this class.
@@ -50,10 +58,13 @@ public class BleachCorrection_ExpoFit {
 		ImageProcessor curip;
 		ImageStatistics imgstat;
 		double[] xA = new double[imp.getStackSize()];
-		double[] yA = new double[imp.getStackSize()];		
+		double[] yA = new double[imp.getStackSize()];
+		
+		if (curROI == null) curROI = new Roi(0, 0, imp.getWidth(), imp.getHeight());
+		
 		for (int i = 0; i < imp.getStackSize(); i++){
 			curip = imp.getImageStack().getProcessor(i+1);
-//			if (curROI != null) curip.setRoi(curROI);
+			curip.setRoi(curROI);
 			imgstat = curip.getStatistics();
 			xA[i] = i; 
 			yA[i] =	imgstat.mean;			
@@ -70,9 +81,9 @@ public class BleachCorrection_ExpoFit {
 		double maxiteration = 2000;
 		double NumRestarts = 2;
 		double errotTol = 10;
-		double[] fitparam = {guess_a, -0.0001, guess_c, maxiteration, NumRestarts, errotTol};
+		double[] fitparam = {-1*guess_a, -0.0001, guess_c, maxiteration, NumRestarts, errotTol};
 		
-		//cf.setInitialParameters(fitparam);
+		cf.setInitialParameters(fitparam);
 		cf.doFit(11); // 
 		Fitter.plot(cf);
 		IJ.log(cf.getResultString());
@@ -92,11 +103,12 @@ public class BleachCorrection_ExpoFit {
 		double[] xA = new double[tframes];
 		double[] yA = new double[tframes];
 		double curStackMean = 0.0; 
+		if (curROI == null) curROI = new Roi(0, 0, imp.getWidth(), imp.getHeight());		
 		for (int i = 0; i < tframes; i++){		
 			curStackMean = 0.0;
 			for (int j = 0; j < zframes; j++){
 				curip = imp.getImageStack().getProcessor(i * zframes + j +1);
-//				if (curROI != null) curip.setRoi(curROI);
+				curip.setRoi(curROI);
 				imgstat = curip.getStatistics();
 				curStackMean += imgstat.mean;
 			}
@@ -111,7 +123,15 @@ public class BleachCorrection_ExpoFit {
 		if (guess_a <= 0){
 			IJ.error("This sequence seems to be not decaying");
 			return null;
-		}	
+		}
+		double guess_c = lastframeint;
+		double maxiteration = 2000;
+		double NumRestarts = 2;
+		double errotTol = 10;
+		double[] fitparam = {-1*guess_a, -0.0001, guess_c, maxiteration, NumRestarts, errotTol};
+		
+		cf.setInitialParameters(fitparam);
+		
 		cf.doFit(11); // 
 		Fitter.plot(cf);
 		IJ.log(cf.getResultString());
