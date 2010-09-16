@@ -90,7 +90,13 @@ public class BleachCorrection implements PlugInFilter {
 				BCSR.correctBleach();
 			}	
 			else if (CorrectionMethod == 1){	//Exponential Fitting Method
-				BleachCorrection_ExpoFit BCEF = new BleachCorrection_ExpoFit(impdup);
+				BleachCorrection_ExpoFit BCEF;
+				if (curROI == null) {
+					BCEF = new BleachCorrection_ExpoFit(impdup);
+				} else {
+					BCEF = new BleachCorrection_ExpoFit(impdup, curROI);
+				}
+					
 				BCEF.core();
 			}
 			else if (CorrectionMethod == 2){	//HIstogram Matching Method
