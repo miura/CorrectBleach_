@@ -27,18 +27,36 @@ package emblcmci;
 import ij.IJ;
 import ij.ImagePlus;
 //import ij.gui.Roi;
+import ij.gui.GenericDialog;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 
 public class BleachCorrection_SimpleRatio {
 	ImagePlus imp;
 	double referenceInt = 0;
+	double baselineInt = 0;
 	/**
 	 * @param imp ImagePlus instance
 	 */
 	public BleachCorrection_SimpleRatio(ImagePlus imp) {
 		super();
 		this.imp = imp;
+	}
+	public BleachCorrection_SimpleRatio(ImagePlus imp, double baselineInt) {
+		super();
+		this.imp = imp;
+		this.baselineInt = baselineInt;
+	}
+	
+	public boolean showDialogAskBaseline()	{
+		GenericDialog gd = new GenericDialog("Bleach Correction");
+		gd.addNumericField("Background Intensity", baselineInt, 1) ;
+		gd.showDialog();
+		if (gd.wasCanceled()) 
+			return false;
+		baselineInt = gd.getNextNumber();
+		return true;
+		
 	}
 	
 	public ImagePlus correctBleach(){
@@ -70,7 +88,7 @@ public class BleachCorrection_SimpleRatio {
 		}
 		
 		ImageStatistics imgstat = new ImageStatistics();
-		ImageProcessor curip;
+		ImageProcessor curip = null;
 		double currentInt = 0.0;
 		double ratio = 1.0;
 		if (!is3DT) {
@@ -79,12 +97,15 @@ public class BleachCorrection_SimpleRatio {
 	//			if (curROI != null) curip.setRoi(curROI);
 				imgstat = curip.getStatistics();
 				if (i == 0) {
-					referenceInt = imgstat.mean;
+					referenceInt = imgstat.mean - baselineInt;
+					curip.add(-1 * baselineInt);
+					
 					System.out.println("ref intensity=" + imgstat.mean);
 				} else {
-					currentInt = imgstat.mean;
+					currentInt = imgstat.mean - baselineInt;
 					
 					ratio = referenceInt / currentInt;
+					curip.add(-1 * baselineInt);
 					curip.multiply(ratio);
 					System.out.println("frame"+i+1+ "mean int="+ currentInt +  " ratio=" + ratio);
 				}
@@ -98,9 +119,12 @@ public class BleachCorrection_SimpleRatio {
 				for (int j = 0; j < zframes; j++) {
 					curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
 					imgstat = curip.getStatistics();
-					currentInt += imgstat.mean;					
+					currentInt += imgstat.mean;
+					curip.add(-1 * baselineInt);
 				}
 				currentInt /= zframes;
+				currentInt -= baselineInt;
+
 				if (i == 0) {
 					referenceInt = currentInt;					
 				} else {

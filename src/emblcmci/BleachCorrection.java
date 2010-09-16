@@ -68,6 +68,7 @@ public class BleachCorrection implements PlugInFilter {
 			ImagePlus impdup = new Duplicator().run(imp);
 			if 		(CorrectionMethod == 0){			//Simple Ratio Method
 				BleachCorrection_SimpleRatio BCSR = new BleachCorrection_SimpleRatio(impdup);
+				BCSR.showDialogAskBaseline();
 				BCSR.correctBleach();
 			}	
 			else if (CorrectionMethod == 1){	//Exponential Fitting Method
