@@ -37,6 +37,7 @@ package emblcmci;
 
 import ij.ImagePlus;
 import ij.gui.GenericDialog;
+import ij.gui.Roi;
 import ij.plugin.Duplicator;
 import ij.plugin.filter.PlugInFilter;
 import ij.process.ImageProcessor;
@@ -65,9 +66,26 @@ public class BleachCorrection implements PlugInFilter {
 
 		@Override
 		public void run(ImageProcessor ip) {
+			Roi curROI = imp.getRoi();
+			//System.out.println("in the method");
+			if (curROI != null) {
+				java.awt.Rectangle rect = curROI.getBounds();
+				System.out.println("(x,y)=(" + rect.x + ","	+ rect.y); 
+				System.out.println("Width="+ rect.width);
+				System.out.println("Height="+ rect.height);
+			} else {
+				System.out.println("No ROI");
+			}
+			imp.killRoi();
 			ImagePlus impdup = new Duplicator().run(imp);
+			if (curROI != null) impdup.setRoi(curROI);
 			if 		(CorrectionMethod == 0){			//Simple Ratio Method
-				BleachCorrection_SimpleRatio BCSR = new BleachCorrection_SimpleRatio(impdup);
+				BleachCorrection_SimpleRatio BCSR = null;
+				if (curROI == null) {
+					BCSR = new BleachCorrection_SimpleRatio(impdup);
+				} else {
+					BCSR = new BleachCorrection_SimpleRatio(impdup, curROI);
+				}
 				BCSR.showDialogAskBaseline();
 				BCSR.correctBleach();
 			}	
@@ -76,8 +94,13 @@ public class BleachCorrection implements PlugInFilter {
 				BCEF.core();
 			}
 			else if (CorrectionMethod == 2){	//HIstogram Matching Method
-				BleachCorrection_MH BCMH = new BleachCorrection_MH();
-				BCMH.bleachCorrectionHM(impdup);				
+				BleachCorrection_MH BCMH = null;
+				//if (curROI == null) {
+					BCMH = new BleachCorrection_MH(impdup);				
+				//} else {
+				//	BCMH = new BleachCorrection_MH(impdup, curROI);
+				//}
+				BCMH.doCorrection();				
 			}
 			impdup.show();
 		}
