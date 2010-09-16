@@ -28,6 +28,7 @@ import ij.IJ;
 import ij.ImagePlus;
 //import ij.gui.Roi;
 import ij.gui.GenericDialog;
+import ij.gui.Roi;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 
@@ -35,6 +36,8 @@ public class BleachCorrection_SimpleRatio {
 	ImagePlus imp;
 	double referenceInt = 0;
 	double baselineInt = 0;
+	Roi curROI = null;
+	
 	/**
 	 * @param imp ImagePlus instance
 	 */
@@ -46,6 +49,15 @@ public class BleachCorrection_SimpleRatio {
 		super();
 		this.imp = imp;
 		this.baselineInt = baselineInt;
+	}
+	/**
+	 * @param imp
+	 * @param curROI
+	 */
+	public BleachCorrection_SimpleRatio(ImagePlus imp, Roi curROI) {
+		super();
+		this.imp = imp;
+		this.curROI = curROI;
 	}
 	
 	public boolean showDialogAskBaseline()	{
@@ -60,17 +72,7 @@ public class BleachCorrection_SimpleRatio {
 	}
 	
 	public ImagePlus correctBleach(){
-/*		Roi curROI = imp.getRoi();
-		System.out.println("in the method");
-		if (curROI != null) {
-			java.awt.Rectangle rect = curROI.getBounds();
-			System.out.println("(x,y)=(" + rect.x + ","	+ rect.y); 
-			System.out.println("Width="+ rect.width);
-			System.out.println("Height="+ rect.height);
-		} else {
-			System.out.println("No ROI");
-		}
-*/
+
 		boolean is3DT = false; 
 		int zframes = 1;
 		int timeframes = 1;
@@ -91,19 +93,20 @@ public class BleachCorrection_SimpleRatio {
 		ImageProcessor curip = null;
 		double currentInt = 0.0;
 		double ratio = 1.0;
+		if (curROI == null) curROI = new Roi(0, 0, imp.getWidth(), imp.getHeight());
 		if (!is3DT) {
 			for (int i = 0; i < imp.getStackSize(); i++){
 				curip = imp.getImageStack().getProcessor(i+1);
-	//			if (curROI != null) curip.setRoi(curROI);
+				curip.setRoi(curROI);
 				imgstat = curip.getStatistics();
+				
+				curip.setRoi(0, 0, imp.getWidth(), imp.getHeight());
 				if (i == 0) {
-					referenceInt = imgstat.mean - baselineInt;
-					curip.add(-1 * baselineInt);
-					
+					referenceInt = imgstat.mean - baselineInt;					
+					curip.add(-1 * baselineInt);	
 					System.out.println("ref intensity=" + imgstat.mean);
 				} else {
-					currentInt = imgstat.mean - baselineInt;
-					
+					currentInt = imgstat.mean - baselineInt;	
 					ratio = referenceInt / currentInt;
 					curip.add(-1 * baselineInt);
 					curip.multiply(ratio);
@@ -111,15 +114,15 @@ public class BleachCorrection_SimpleRatio {
 				}
 				
 			}
-	//		if (curROI.isArea())
-	//			System.out.println("ROI is an area");
 		} else {
 			for (int i = 0; i < timeframes; i++){
 				currentInt = 0.0;
 				for (int j = 0; j < zframes; j++) {
 					curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+					curip.setRoi(curROI);
 					imgstat = curip.getStatistics();
 					currentInt += imgstat.mean;
+					curip.setRoi(0, 0, imp.getWidth(), imp.getHeight());
 					curip.add(-1 * baselineInt);
 				}
 				currentInt /= zframes;
@@ -131,6 +134,7 @@ public class BleachCorrection_SimpleRatio {
 					ratio = referenceInt / currentInt;
 					for (int j = 0; j < zframes; j++) {
 						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+						curip.setRoi(0, 0, imp.getWidth(), imp.getHeight());
 						curip.multiply(ratio);
 					}
 					System.out.println("frame"+i+1+ ": mean int="+ currentInt +  " ratio=" + ratio);
