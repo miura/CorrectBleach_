@@ -5,22 +5,26 @@
   <property name="build" location="bin" />
   <property name="dist"  location="dist" />
  
-	 <property name="pluginsDir"  location="$basedir/../../imagej/plugins/" />
+	<property name="pluginsDir"  location="$basedir/../../imagej/plugins/" />
+	<property name="FijiPluginsDir"  location="D:\\Fiji.app\\\plugins\\" />
  
-  <property name="user.name" value="Kota Miura" ></property>
+    <property name="user.name" value="Kota Miura" ></property>
+ 	<property name="jarname" value="CorrectBleach_.jar" ></property>	
 <target name="main" depends="compress" description="Main target">
 	<echo>
 		Building the .jar file.
 	</echo>
 </target>
  <target name="compress" depends="" description="generate the distribution">
- 	<jar jarfile="CorrectBleach_.jar">
+		<jar jarfile="${jarname}">
  		<fileset dir="." includes="plugins.config" />
+ 		<fileset dir="${src}" includes="**/*.*" /> 		
 		<fileset dir="${build}" includes="**/*.*" ></fileset>
  		<manifest>
  		 	 	      <attribute name="Built-By" value="${user.name}"/>
  		</manifest>
  	</jar>
-    <copy file="CorrectBleach_.jar" toDir="${pluginsDir}" />
+    <copy file="${jarname}" toDir="${pluginsDir}" />
+	<copy file="${jarname}" toDir="${FijiPluginsDir}" />	
   </target>
 </project>
