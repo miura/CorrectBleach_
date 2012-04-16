@@ -5,8 +5,9 @@
 	<property name="build" location="bin" />
 	<property name="dist"  location="dist" />
 
-	<property name="pluginsDir"  location="$basedir/../../imagej/plugins/" />
-	<property name="FijiPluginsDir"  location="D:\\Fiji.app\\\plugins\\" />
+	<property name="pluginsDir"  location="$basedir/../../../imagej/plugins/" />
+	<property name="fijipluginsDir"  location="/Applications/Fiji.app/plugins/" />	
+	<property name="ws1pluginsDir"  location="/users/miura/Documents/ws1/imagej/plugins/" />
 
 	<property name="user.name" value="Kota Miura" >
 	</property>
@@ -28,6 +29,16 @@
 			</manifest>
 		</jar>
 		<copy file="${jarname}" toDir="${pluginsDir}" />
-		<copy file="${jarname}" toDir="${FijiPluginsDir}" />
+			<echo>
+	 			Copied to ${pluginsDir}
+	 		</echo>
+		<copy file="${jarname}" toDir="${ws1pluginsDir}" />
+			<echo>
+	 			Copied to ${ws1pluginsDir}
+	 		</echo>
+		<copy file="${jarname}" toDir="${fijipluginsDir}" />
+ 		<echo>
+ 			Copied to ${fijipluginsDir}
+ 		</echo>	 		
 	</target>
 </project>
