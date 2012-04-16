@@ -3,7 +3,7 @@ package emblcmci;
 /** Bleach Correction by Fitting Exponential Decay function.
  *  Kota Miura (miura@embl.de)
  * 
- * 2D and 3D time series processed in different ways. 
+ * 2D and 3D time series corrected by fitting exponential decay function.
  *  
  * Copyright © 2010 Kota Miura
  * License: GPL 2

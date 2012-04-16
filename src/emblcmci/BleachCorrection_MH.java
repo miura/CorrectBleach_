@@ -9,6 +9,8 @@ package emblcmci;
  * contact: Kota Miura (CMCI, EMBL Heidelberg, miura@embl.de)
  * 
  * works with 8bit and 16 bit stacks. 
+ * this correction algorithm is not appropriate for intensity measurements. 
+ * use only for segmentation. 
  *  
  * Copyright © 2010 Kota Miura
  * License: GPL 2

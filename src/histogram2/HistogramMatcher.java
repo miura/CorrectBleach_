@@ -7,6 +7,10 @@
  * See http://www.imagingbook.com for details and licensing conditions.
  * 
  * Date: 2007/11/10
+ * 
+ * ------
+ * the code taken from the trextbook website. 
+ * 
  */
 
 package histogram2;

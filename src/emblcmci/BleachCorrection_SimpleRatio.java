@@ -4,6 +4,8 @@ package emblcmci;
  *  Migrated from 2D algorithm of ImageJ Macro written by Jens Rietdorf
  *  Original macro could be found at http://www.embl.de/eamnet/html/bleach_correction.html 
  *  
+ *  This correction algorithm resembles the method by Phair. 
+ *   
  *  This plugin works on 2D and 3D time series (for 3D time series, it should be a hyperstack). 
  *  in case of 3D times series, mean intensity in the first time point stack becomes the reference.
  *  @author Kota Miura (miura@embl.de)
