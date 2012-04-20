@@ -170,7 +170,10 @@ public class BleachCorrection_ExpoFit {
 		FloatProcessor ip2 = ip.duplicate().toFloat(0, null);
 		float[] destA = (float[]) ip2.getPixels();
 		for (int i = 0; i < ipfA.length; i++){
-			destA[i] = (float) ((ipfA[i] - c) * Math.exp(-b*x) + c); 
+			float amp = (float) Math.abs(ipfA[i] - c);
+			destA[i] = (float) (amp * Math.exp(-b*x) + c)/ipfA[i] ;
+//			if (destA[i]<1.0)
+//					IJ.log(Float.toString(destA[i]));
 		}
 		return ip2;
 	}
@@ -259,12 +262,12 @@ public class BleachCorrection_ExpoFit {
 			} else {
 				ImageProcessor firstip = imp.getImageStack().getProcessor(1);
 				int imtype = imp.getType();
-				Float[] cipA, ratioA;
+				float[] cipA, ratioA;
 				for (int i = 0; i < imp.getStackSize(); i++){
 					curip = imp.getImageStack().getProcessor(i+1);					
 					FloatProcessor ratioim = calcExponentialOffset(firstip, res_b, res_c, (double) i+1);
-					cipA = (Float[]) curip.duplicate().toFloat(0, null).getPixels();
-					ratioA = (Float[]) ratioim.getPixels();
+					cipA = (float[]) curip.duplicate().toFloat(0, null).getPixels();
+					ratioA = (float[]) ratioim.getPixels();
 					for (int j = 0; j < cipA.length; j++)
 						if (ratioA[j] != 0)
 						ratioA[j] = (float) Math.round(cipA[j]/ratioA[j]);					

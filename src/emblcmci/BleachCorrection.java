@@ -7,12 +7,21 @@ package emblcmci;
  * 		Plugin version of Jens Rietdorf's macro, additionally with 3D time series 
  * 			see http://www.embl.de/eamnet/html/bleach_correction.html
  *
- *  Exponential Fitting Method:
+ *  Exponential Fitting Method (Frame-wise correction):
  *  	Similar to MBF-ImageJ method, additionally with 3D time series. 
  *  		See http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
  *  	MBF-ImageJ suggests to use "Exponential" equation for fitting, 
  *  	whereas this plugin uses "Exponential with Offset"
- *
+ *      correction is made with a single ratio to whole frame
+ * 
+ *  Exponential Fitting Method (Pixel-wise correction):
+ *  	Similar to MBF-ImageJ method, additionally with 3D time series. 
+ *  		See http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
+ *  	MBF-ImageJ suggests to use "Exponential" equation for fitting, 
+ *  	whereas this plugin uses "Exponential with Offset"
+ *      decay ratio is estimated for every pixel and corrected accordingly.
+ *      (Intensity of each pixel at the starting of the sequence is used for the estimation)  
+ *  
  *  HIstogram Matching Method:
  *  	This method does much better restoration of bleaching sequence 
  *  	for segmentation but might not good for intensity quantification.  
@@ -49,9 +58,9 @@ import emblcmci.BleachCorrection_SimpleRatio;
 public class BleachCorrection implements PlugInFilter {
 		ImagePlus imp;
 		
-		String[] CorrectionMethods =  { "Simple Ratio", "Exponential Fit", "Histogram Matching" };
+		String[] CorrectionMethods =  { "Simple Ratio", "Exponential Fit (Frame-wise)","Exponential Fit (Pixel-wise)", "Histogram Matching" };
 		
-		/**Correction Method  0: simple ratio 1: exponential fit 2: histogramMatch
+		/**Correction Method  0: simple ratio 1: exponential fit frame 2: exponential fit pixel 3: histogramMatch
 		*/
 		private static int CorrectionMethod = 0;  
 
@@ -99,7 +108,17 @@ public class BleachCorrection implements PlugInFilter {
 					
 				BCEF.core();
 			}
-			else if (CorrectionMethod == 2){	//HIstogram Matching Method
+			else if (CorrectionMethod == 2){	//Exponential Fitting Method
+				BleachCorrection_ExpoFit BCEF;
+				if (curROI == null) {
+					BCEF = new BleachCorrection_ExpoFit(impdup);
+				} else {
+					BCEF = new BleachCorrection_ExpoFit(impdup, curROI);
+				}
+					
+				BCEF.core2();
+			}			
+			else if (CorrectionMethod == 3){	//HIstogram Matching Method
 				BleachCorrection_MH BCMH = null;
 				//if (curROI == null) {
 					BCMH = new BleachCorrection_MH(impdup);				
