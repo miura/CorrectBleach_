@@ -166,9 +166,9 @@ public class BleachCorrection_ExpoFit {
 	 * @return
 	 */
 	public FloatProcessor calcExponentialOffset(ImageProcessor ip, double b, double c, double x){
-		Float[] ipfA = (Float[]) ip.toFloat(0, null).getPixels();
+		float[] ipfA = (float[]) ip.toFloat(0, null).getPixels();
 		FloatProcessor ip2 = ip.duplicate().toFloat(0, null);
-		Float[] destA = (Float[]) ip2.getPixels();
+		float[] destA = (float[]) ip2.getPixels();
 		for (int i = 0; i < ipfA.length; i++){
 			destA[i] = (float) ((ipfA[i] - c) * Math.exp(-b*x) + c); 
 		}
