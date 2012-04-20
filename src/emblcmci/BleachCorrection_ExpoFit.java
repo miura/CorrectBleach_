@@ -26,6 +26,8 @@ import ij.ImagePlus;
 import ij.gui.Roi;
 import ij.measure.CurveFitter;
 import ij.plugin.frame.Fitter;
+import ij.process.Blitter;
+import ij.process.FloatProcessor;
 import ij.process.ImageProcessor;
 import ij.process.ImageStatistics;
 
@@ -74,7 +76,12 @@ public class BleachCorrection_ExpoFit {
 		double lastframeint = yA[yA.length-1];
 		double guess_a = firstframeint - lastframeint; 
 		if (guess_a <= 0){
-			IJ.error("This sequence seems to be not decaying");
+			IJ.error(
+					"Signal seems to be not bleaching. \n" +
+					"Processing terminates!!\n" +
+					"... Reason:" +
+					"total intensity of the first frame is \n" +
+					"smaller than that of the last frame");
 			return null;
 		}
 		double guess_c = lastframeint;
@@ -150,6 +157,23 @@ public class BleachCorrection_ExpoFit {
 	public double calcExponentialOffset(double a, double b, double c, double x){
 		return (a * Math.exp(-b*x) + c);
 	}
+	/** 20120420
+	 *  returns a FloatProcessor, ratio at the corresponding time point x
+	 * @param ip
+	 * @param b
+	 * @param c
+	 * @param x
+	 * @return
+	 */
+	public FloatProcessor calcExponentialOffset(ImageProcessor ip, double b, double c, double x){
+		Float[] ipfA = (Float[]) ip.toFloat(0, null).getPixels();
+		FloatProcessor ip2 = ip.duplicate().toFloat(0, null);
+		Float[] destA = (Float[]) ip2.getPixels();
+		for (int i = 0; i < ipfA.length; i++){
+			destA[i] = (float) ((ipfA[i] - c) * Math.exp(-b*x) + c); 
+		}
+		return ip2;
+	}
 	
 	/** does both decay fitting and bleach correction. 
 	 * 
@@ -170,29 +194,95 @@ public class BleachCorrection_ExpoFit {
 		CurveFitter cf;
 		if (is3DT) cf = decayFitting3D(zframes, tframes);
 		else cf = dcayFitting();
-		double[] respara = cf.getParams(); 
-		double res_a = respara[0];
-		double res_b = respara[1];
-		double res_c = respara[2];
-		double ratio = 0.0;
-		ImageProcessor curip;
-		System.out.println(res_a + "," + res_b + "," + res_c);
-		if (is3DT){
-			for (int i = 0; i < tframes; i++){
-				for (int j = 0; j < zframes; j++){
-					curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+		if (cf != null) {
+			double[] respara = cf.getParams(); 
+			double res_a = respara[0];
+			double res_b = respara[1];
+			double res_c = respara[2];
+			double ratio = 0.0;
+			ImageProcessor curip;
+			System.out.println(res_a + "," + res_b + "," + res_c);
+			if (is3DT){
+				for (int i = 0; i < tframes; i++){
+					for (int j = 0; j < zframes; j++){
+						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+						curip.multiply(ratio);					
+					}
+				}	
+			} else {
+				for (int i = 0; i < imp.getStackSize(); i++){
+					curip = imp.getImageStack().getProcessor(i+1);
 					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
-					curip.multiply(ratio);					
+					curip.multiply(ratio);
 				}
-			}	
-		} else {
-			for (int i = 0; i < imp.getStackSize(); i++){
-				curip = imp.getImageStack().getProcessor(i+1);
-				ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
-				curip.multiply(ratio);
 			}
 		}
 	}
+	/** Implement pixelwise-decay calculations.
+	 * Problem occurs if the obejct is moving a lot. 
+	 * For example, ratio estimated using background might be applied to the signal part that has moved in.  
+	 * 
+	 */
+	public void core2(){
+		int[] impdimA = imp.getDimensions();
+		IJ.log("slices"+Integer.toString(impdimA[3])+"  -- frames"+Integer.toString(impdimA[4]));
+		//IJ.log(Integer.toString(imp.getNChannels())+":"+Integer.toString(imp.getNSlices())+":"+ Integer.toString(imp.getNFrames()));
+		int zframes = impdimA[3]; 
+		int tframes = impdimA[4];
+		if (impdimA[3]>1 && impdimA[4]>1){	// if slices and frames are both more than 1
+			is3DT =true;
+			if ((impdimA[3] * impdimA[4]) != imp.getStackSize()){
+				IJ.showMessage("slice and time frames do not match with the length of the stack. Please correct!");
+				return;
+			}
+		}
+		CurveFitter cf;
+		if (is3DT) cf = decayFitting3D(zframes, tframes);
+		else cf = dcayFitting();
+		if (cf != null) {
+			double[] respara = cf.getParams(); 
+			double res_a = respara[0];
+			double res_b = respara[1];
+			double res_c = respara[2];
+			double ratio = 0.0;
+			ImageProcessor curip;
+			System.out.println(res_a + "," + res_b + "," + res_c);
+			if (is3DT){
+				for (int i = 0; i < tframes; i++){
+					for (int j = 0; j < zframes; j++){
+						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+						curip.multiply(ratio);					
+					}
+				}	
+			} else {
+				ImageProcessor firstip = imp.getImageStack().getProcessor(1);
+				int imtype = imp.getType();
+				Float[] cipA, ratioA;
+				for (int i = 0; i < imp.getStackSize(); i++){
+					curip = imp.getImageStack().getProcessor(i+1);					
+					FloatProcessor ratioim = calcExponentialOffset(firstip, res_b, res_c, (double) i+1);
+					cipA = (Float[]) curip.duplicate().toFloat(0, null).getPixels();
+					ratioA = (Float[]) ratioim.getPixels();
+					for (int j = 0; j < cipA.length; j++)
+						if (ratioA[j] != 0)
+						ratioA[j] = (float) Math.round(cipA[j]/ratioA[j]);					
+					if (imtype == imp.GRAY8)
+						ratioim.convertToByte(false);
+					else if (imtype == imp.GRAY16)
+						ratioim.convertToShort(false);
+					else if (imtype == imp.GRAY32){
+						
+					} else {
+						IJ.error("this image type not implemented");
+					}					
+					curip.copyBits(ratioim, 0, 0, Blitter.COPY);
+						
+				}
+			}
+		}
+	}	
 	
 
 	
