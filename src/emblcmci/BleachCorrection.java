@@ -58,7 +58,12 @@ import emblcmci.BleachCorrection_SimpleRatio;
 public class BleachCorrection implements PlugInFilter {
 		ImagePlus imp;
 		
-		String[] CorrectionMethods =  { "Simple Ratio", "Exponential Fit (Frame-wise)","Exponential Fit (Pixel-wise)", "Histogram Matching" };
+		String[] CorrectionMethods =  { 
+				"Simple Ratio", 
+				"Exponential Fit (Frame-wise)",
+				"Exponential Fit (Pixel-wise)", 
+				"Exponential Fit (Frame-Wise Double Fit)", 
+				"Histogram Matching" };
 		
 		/**Correction Method  0: simple ratio 1: exponential fit frame 2: exponential fit pixel 3: histogramMatch
 		*/
@@ -117,8 +122,18 @@ public class BleachCorrection implements PlugInFilter {
 				}
 					
 				BCEF.core2();
-			}			
-			else if (CorrectionMethod == 3){	//HIstogram Matching Method
+			}
+			else if (CorrectionMethod == 3){	//Exponential Fitting Method
+				BleachCorrection_ExpoFit BCEF;
+				if (curROI == null) {
+					BCEF = new BleachCorrection_ExpoFit(impdup);
+				} else {
+					BCEF = new BleachCorrection_ExpoFit(impdup, curROI);
+				}
+					
+				BCEF.core3();
+			}						
+			else if (CorrectionMethod == 4){	//HIstogram Matching Method
 				BleachCorrection_MH BCMH = null;
 				//if (curROI == null) {
 					BCMH = new BleachCorrection_MH(impdup);				
