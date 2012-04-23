@@ -159,21 +159,19 @@ public class BleachCorrection_ExpoFit {
 	}
 	/** 20120420
 	 *  returns a FloatProcessor, ratio at the corresponding time point x
-	 * @param ip
-	 * @param b
+	 * @param ip iprocessor of current frame
+ 	 * @param b
 	 * @param c
 	 * @param x
 	 * @return
 	 */
-	public FloatProcessor calcExponentialOffset(ImageProcessor ip, double b, double c, double x){
+	public FloatProcessor calcOriginalExponential(ImageProcessor ip, double b, double c, double x){
 		float[] ipfA = (float[]) ip.toFloat(0, null).getPixels();
 		FloatProcessor ip2 = ip.duplicate().toFloat(0, null);
 		float[] destA = (float[]) ip2.getPixels();
 		for (int i = 0; i < ipfA.length; i++){
-			float amp = (float) Math.abs(ipfA[i] - c);
-			destA[i] = (float) (amp * Math.exp(-b*x) + c)/ipfA[i] ;
-//			if (destA[i]<1.0)
-//					IJ.log(Float.toString(destA[i]));
+//			destA[i] = (float) (amp * Math.exp(-b*x) + c)/ipfA[i] ;
+			destA[i] = (float) ((ipfA[i] - c)/Math.exp(-b*x) + c) ;
 		}
 		return ip2;
 	}
@@ -265,22 +263,22 @@ public class BleachCorrection_ExpoFit {
 				float[] cipA, ratioA;
 				for (int i = 0; i < imp.getStackSize(); i++){
 					curip = imp.getImageStack().getProcessor(i+1);					
-					FloatProcessor ratioim = calcExponentialOffset(firstip, res_b, res_c, (double) i+1);
-					cipA = (float[]) curip.duplicate().toFloat(0, null).getPixels();
-					ratioA = (float[]) ratioim.getPixels();
-					for (int j = 0; j < cipA.length; j++)
-						if (ratioA[j] != 0)
-						ratioA[j] = (float) Math.round(cipA[j]/ratioA[j]);					
+					FloatProcessor estim = calcOriginalExponential(curip, res_b, res_c, (double) i+1);
+			//		cipA = (float[]) curip.duplicate().toFloat(0, null).getPixels();
+//					ratioA = (float[]) ratioim.getPixels();
+//					for (int j = 0; j < cipA.length; j++)
+//						if (ratioA[j] != 0)
+//						ratioA[j] = (float) Math.round(cipA[j]/ratioA[j]);					
 					if (imtype == imp.GRAY8)
-						ratioim.convertToByte(false);
+						estim.convertToByte(false);
 					else if (imtype == imp.GRAY16)
-						ratioim.convertToShort(false);
+						estim.convertToShort(false);
 					else if (imtype == imp.GRAY32){
 						
 					} else {
 						IJ.error("this image type not implemented");
 					}					
-					curip.copyBits(ratioim, 0, 0, Blitter.COPY);
+					curip.copyBits(estim, 0, 0, Blitter.COPY);
 						
 				}
 			}
@@ -288,5 +286,71 @@ public class BleachCorrection_ExpoFit {
 	}	
 	
 
+	/** does both DOUBLE decay fitting and bleach correction. 
+	 * ... first fit is for baseline estimation, second for the ratio calculation. 
+	 */
+	public void core3(){
+		int[] impdimA = imp.getDimensions();
+		IJ.log("slices"+Integer.toString(impdimA[3])+"  -- frames"+Integer.toString(impdimA[4]));
+		//IJ.log(Integer.toString(imp.getNChannels())+":"+Integer.toString(imp.getNSlices())+":"+ Integer.toString(imp.getNFrames()));
+		int zframes = impdimA[3]; 
+		int tframes = impdimA[4];
+		if (impdimA[3]>1 && impdimA[4]>1){	// if slices and frames are both more than 1
+			is3DT =true;
+			if ((impdimA[3] * impdimA[4]) != imp.getStackSize()){
+				IJ.showMessage("slice and time frames do not match with the length of the stack. Please correct!");
+				return;
+			}
+		}
+		CurveFitter cf;
+		if (is3DT) cf = decayFitting3D(zframes, tframes);
+		else cf = dcayFitting();
+		if (cf != null){
+			double base_c = cf.getParams()[2];
+			ImageProcessor curip;
+			System.out.println("baseline level:" + base_c);
+			//subtract baseline
+			if (is3DT){
+				for (int i = 0; i < tframes; i++){
+					for (int j = 0; j < zframes; j++){
+						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+						curip.subtract(base_c);					
+					}
+				}	
+			} else {
+				for (int i = 0; i < imp.getStackSize(); i++){
+					curip = imp.getImageStack().getProcessor(i+1);
+					curip.subtract(base_c);					
+				}
+			}			
+		}
+		//second round
+		if (is3DT) cf = decayFitting3D(zframes, tframes);
+		else cf = dcayFitting();			
+		if (cf != null) {
+			double[] respara = cf.getParams(); 
+			double res_a = respara[0];
+			double res_b = respara[1];
+			double res_c = respara[2];
+			double ratio = 0.0;
+			ImageProcessor curip;
+			System.out.println(res_a + "," + res_b + "," + res_c);
+			if (is3DT){
+				for (int i = 0; i < tframes; i++){
+					for (int j = 0; j < zframes; j++){
+						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
+						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+						curip.multiply(ratio);					
+					}
+				}	
+			} else {
+				for (int i = 0; i < imp.getStackSize(); i++){
+					curip = imp.getImageStack().getProcessor(i+1);
+					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+					curip.multiply(ratio);
+				}
+			}
+		}
+	}
 	
 }
