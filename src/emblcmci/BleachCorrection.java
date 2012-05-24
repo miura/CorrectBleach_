@@ -14,13 +14,8 @@ package emblcmci;
  *  	whereas this plugin uses "Exponential with Offset"
  *      correction is made with a single ratio to whole frame
  * 
- *  Exponential Fitting Method (Pixel-wise correction):
- *  	Similar to MBF-ImageJ method, additionally with 3D time series. 
- *  		See http://www.macbiophotonics.ca/imagej/t.htm#t_bleach
- *  	MBF-ImageJ suggests to use "Exponential" equation for fitting, 
- *  	whereas this plugin uses "Exponential with Offset"
- *      decay ratio is estimated for every pixel and corrected accordingly.
- *      (Intensity of each pixel at the starting of the sequence is used for the estimation)  
+ *  Exponential Fitting Method (Under development, Pixel-wise correction):
+ *      Intensity of each pixel at the starting of the sequence is used for the estimation  
  *  
  *  HIstogram Matching Method:
  *  	This method does much better restoration of bleaching sequence 
@@ -121,7 +116,7 @@ public class BleachCorrection implements PlugInFilter {
 					BCEF = new BleachCorrection_ExpoFit(impdup, curROI);
 				}
 					
-				BCEF.core3();
+				BCEF.coreSubtractBase();
 			}
 			//Exponential Fitting Method, experimental. Pixel-wise fitting. 
 			else if (CorrectionMethod == 3){	
@@ -132,7 +127,7 @@ public class BleachCorrection implements PlugInFilter {
 					BCEF = new BleachCorrection_ExpoFit(impdup, curROI);
 				}
 					
-				BCEF.core2();
+				BCEF.coreTest();
 			}
 
 			else if (CorrectionMethod == 4){	//HIstogram Matching Method

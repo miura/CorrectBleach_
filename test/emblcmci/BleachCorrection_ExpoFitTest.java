@@ -39,7 +39,7 @@ public class BleachCorrection_ExpoFitTest {
 	@Test
 	public void testCalcExponentialOffset() {
 		ImageProcessor ip = this.imp.getImageStack().getProcessor(1);
-		FloatProcessor fp = bcex.calcExponentialOffset(ip, 0.12, 66, 100);
+		FloatProcessor fp = bcex.calcOriginalExponential(ip, 0.12, 66, 100);
 		String ts = fp.toString();
 		IJ.log(ts);
 		float[] fpa = (float[]) fp.getPixels();
@@ -55,7 +55,7 @@ public class BleachCorrection_ExpoFitTest {
 
 //	@Test
 	public void testCore2() {
-		this.bcex.core2();
+		this.bcex.coreTest();
 		this.imp.show();
 	}
 

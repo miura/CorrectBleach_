@@ -159,6 +159,7 @@ public class BleachCorrection_ExpoFit {
 	}
 	/** 20120420
 	 *  returns a FloatProcessor, ratio at the corresponding time point x
+	 *  
 	 * @param ip iprocessor of current frame
  	 * @param b
 	 * @param c
@@ -207,25 +208,25 @@ public class BleachCorrection_ExpoFit {
 				for (int i = 0; i < tframes; i++){
 					for (int j = 0; j < zframes; j++){
 						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
-						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (i + 1));
 						curip.multiply(ratio);					
 					}
 				}	
 			} else {
 				for (int i = 0; i < imp.getStackSize(); i++){
 					curip = imp.getImageStack().getProcessor(i+1);
-					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (i + 1));
 					curip.multiply(ratio);
 				}
 			}
 		}
 	}
-	/** Implement pixelwise-decay calculations.
-	 * Problem occurs if the obejct is moving a lot. 
+	/** Under development, Implement pixelwise-decay calculations.
+	 * Limited usage. if the object is moving aournd, then the results are completely wrong. 
 	 * For example, ratio estimated using background might be applied to the signal part that has moved in.  
 	 * 
 	 */
-	public void core2(){
+	public void coreTest(){
 		int[] impdimA = imp.getDimensions();
 		IJ.log("slices"+Integer.toString(impdimA[3])+"  -- frames"+Integer.toString(impdimA[4]));
 		//IJ.log(Integer.toString(imp.getNChannels())+":"+Integer.toString(imp.getNSlices())+":"+ Integer.toString(imp.getNFrames()));
@@ -253,7 +254,7 @@ public class BleachCorrection_ExpoFit {
 				for (int i = 0; i < tframes; i++){
 					for (int j = 0; j < zframes; j++){
 						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
-						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (i + 1));
 						curip.multiply(ratio);					
 					}
 				}	
@@ -269,11 +270,11 @@ public class BleachCorrection_ExpoFit {
 //					for (int j = 0; j < cipA.length; j++)
 //						if (ratioA[j] != 0)
 //						ratioA[j] = (float) Math.round(cipA[j]/ratioA[j]);					
-					if (imtype == imp.GRAY8)
+					if (imtype == ImagePlus.GRAY8)
 						estim.convertToByte(false);
-					else if (imtype == imp.GRAY16)
+					else if (imtype == ImagePlus.GRAY16)
 						estim.convertToShort(false);
-					else if (imtype == imp.GRAY32){
+					else if (imtype == ImagePlus.GRAY32){
 						
 					} else {
 						IJ.error("this image type not implemented");
@@ -289,7 +290,7 @@ public class BleachCorrection_ExpoFit {
 	/** does both DOUBLE decay fitting and bleach correction. 
 	 * ... first fit is for baseline estimation, second for the ratio calculation. 
 	 */
-	public void core3(){
+	public void coreSubtractBase(){
 		int[] impdimA = imp.getDimensions();
 		IJ.log("slices"+Integer.toString(impdimA[3])+"  -- frames"+Integer.toString(impdimA[4]));
 		//IJ.log(Integer.toString(imp.getNChannels())+":"+Integer.toString(imp.getNSlices())+":"+ Integer.toString(imp.getNFrames()));
@@ -339,14 +340,14 @@ public class BleachCorrection_ExpoFit {
 				for (int i = 0; i < tframes; i++){
 					for (int j = 0; j < zframes; j++){
 						curip = imp.getImageStack().getProcessor(i * zframes + j + 1);
-						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+						ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (i + 1));
 						curip.multiply(ratio);					
 					}
 				}	
 			} else {
 				for (int i = 0; i < imp.getStackSize(); i++){
 					curip = imp.getImageStack().getProcessor(i+1);
-					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (double) (i + 1));
+					ratio = calcExponentialOffset(res_a, res_b, res_c, 0.0) / calcExponentialOffset(res_a, res_b, res_c, (i + 1));
 					curip.multiply(ratio);
 				}
 			}
