@@ -1,4 +1,4 @@
-package emblcmci.ext;
+package emblcmci.gmm;
 
 /*
  * Mixture Modeling algorithm
