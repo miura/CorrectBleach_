@@ -7,7 +7,7 @@
 
 	<property name="pluginsDir"  location="$basedir/../../../imagej/plugins/" />
 	<property name="fijipluginsDir"  location="/Applications/Fiji.app/plugins/" />	
-	<property name="ws1pluginsDir"  location="/users/miura/Documents/ws1/imagej/plugins/" />
+	<property name="ws1pluginsDir"  location="${basedir}/../imagej/plugins/" />
 
 	<property name="user.name" value="Kota Miura" >
 	</property>
@@ -28,11 +28,13 @@
 				<attribute name="Built-By" value="${user.name}"/>
 			</manifest>
 		</jar>
+<!--
 		<copy file="${jarname}" toDir="${pluginsDir}" />
 			<echo>
 	 			Copied to ${pluginsDir}
 	 		</echo>
-		<copy file="${jarname}" toDir="${ws1pluginsDir}" />
+-->
+		<copy file="${jarname}" toDir="${pluginsDir}" />
 			<echo>
 	 			Copied to ${ws1pluginsDir}
 	 		</echo>
